@@ -77,4 +77,36 @@ class LineToZView (ctx : Context) : View(ctx) {
             }
         }
     }
+
+    data class LineToZ (var i : Int, private val state : State = State()) {
+        fun draw(canvas : Canvas, paint : Paint) {
+            val w : Float = canvas.width.toFloat()
+            val h : Float = canvas.height.toFloat()
+            val size : Float = Math.min(w, h)/8
+            if (state.scales.size == 3) {
+                canvas.save()
+                canvas.translate(w/2, h/2)
+                for (i in 0..1) {
+                    canvas.save()
+                    canvas.translate(0f, (size) * Math.sqrt(2.0).toFloat() * (1 - 2 * i))
+                    for (j in 0..1) {
+                        canvas.save()
+                        canvas.rotate(-45f * j * state.scales[2])
+                        canvas.drawLine(0f, 0f, size * state.scales[0], 0f, paint)
+                        canvas.restore()
+                    }
+                    canvas.restore()
+                }
+                canvas.restore()
+            }
+        }
+
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+    }
 }
