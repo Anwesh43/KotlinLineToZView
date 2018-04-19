@@ -83,6 +83,9 @@ class LineToZView (ctx : Context) : View(ctx) {
             val w : Float = canvas.width.toFloat()
             val h : Float = canvas.height.toFloat()
             val size : Float = Math.min(w, h)/8
+            paint.color = Color.parseColor("#4CAF50")
+            paint.strokeWidth = Math.min(w, h) / 55
+            paint.strokeCap = Paint.Cap.ROUND
             if (state.scales.size == 3) {
                 canvas.save()
                 canvas.translate(w/2, h/2)
@@ -107,6 +110,29 @@ class LineToZView (ctx : Context) : View(ctx) {
 
         fun startUpdating(startcb : () -> Unit) {
             state.startUpdating(startcb)
+        }
+    }
+
+    data class Renderer (var view : LineToZView) {
+
+        private val lineToZ : LineToZ = LineToZ(0)
+
+        private val animator : Animator = Animator(view)
+
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            lineToZ.draw(canvas, paint)
+            animator.animate {
+                lineToZ.update {
+                    animator.stop()
+                }
+            }
+        }
+
+        fun handleTap() {
+            lineToZ.startUpdating {
+                animator.start()
+            }
         }
     }
 }
