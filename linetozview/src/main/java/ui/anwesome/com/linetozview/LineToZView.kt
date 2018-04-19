@@ -42,6 +42,7 @@ class LineToZView (ctx : Context) : View(ctx) {
                     j -= dir.toInt()
                     prevScale = scales[j]
                     dir = 0f
+                    stopcb(prevScale)
                 }
             }
         }
@@ -57,6 +58,7 @@ class LineToZView (ctx : Context) : View(ctx) {
     data class Animator(var view : View, var animated : Boolean = false) {
         fun animate(updatecb : () -> Unit) {
             if (animated) {
+                updatecb()
                 try {
                     Thread.sleep(50)
                     view.invalidate()
@@ -85,7 +87,7 @@ class LineToZView (ctx : Context) : View(ctx) {
         fun draw(canvas : Canvas, paint : Paint) {
             val w : Float = canvas.width.toFloat()
             val h : Float = canvas.height.toFloat()
-            val size : Float = Math.min(w, h)/8
+            val size : Float = Math.min(w, h)/3
             paint.color = Color.parseColor("#4CAF50")
             paint.strokeWidth = Math.min(w, h) / 55
             paint.strokeCap = Paint.Cap.ROUND
@@ -94,11 +96,13 @@ class LineToZView (ctx : Context) : View(ctx) {
                 canvas.translate(w/2, h/2)
                 for (i in 0..1) {
                     canvas.save()
-                    canvas.translate(0f, (size) * Math.sqrt(2.0).toFloat() * (1 - 2 * i))
+                    canvas.translate(-(size)/2 * (1 - 2 * i), (size/2) * Math.sqrt(3.0).toFloat() *  (1 - 2 * i) * state.scales[1])
                     for (j in 0..1) {
                         canvas.save()
-                        canvas.rotate(-45f * j * state.scales[2])
-                        canvas.drawLine(0f, 0f, size * state.scales[0], 0f, paint)
+                        canvas.rotate(-60f * j * state.scales[2])
+                        val dx :Float = 0f
+                        val ox : Float = - (size + dx * j * state.scales[2])
+                        canvas.drawLine(ox * i, 0f, ox * i + size * state.scales[0] + dx * j * state.scales[2], 0f, paint)
                         canvas.restore()
                     }
                     canvas.restore()
@@ -143,7 +147,7 @@ class LineToZView (ctx : Context) : View(ctx) {
         fun create(activity : Activity) : LineToZView{
             val view : LineToZView = LineToZView(activity)
             activity.setContentView(view)
-            return view 
+            return view
         }
     }
 }
