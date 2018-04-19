@@ -4,6 +4,7 @@ package ui.anwesome.com.linetozview
  * Created by anweshmishra on 19/04/18.
  */
 
+import android.app.Activity
 import android.content.*
 import android.graphics.*
 import android.view.View
@@ -135,6 +136,14 @@ class LineToZView (ctx : Context) : View(ctx) {
             lineToZ.startUpdating {
                 animator.start()
             }
+        }
+    }
+
+    companion object {
+        fun create(activity : Activity) : LineToZView{
+            val view : LineToZView = LineToZView(activity)
+            activity.setContentView(view)
+            return view 
         }
     }
 }
